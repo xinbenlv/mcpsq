@@ -1,0 +1,355 @@
+{
+  "mcpServers": {
+    "aws-kb-retrieval": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-aws-kb-retrieval"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "YOUR_ACCESS_KEY_HERE",
+        "AWS_SECRET_ACCESS_KEY": "YOUR_SECRET_ACCESS_KEY_HERE",
+        "AWS_REGION": "YOUR_AWS_REGION_HERE"
+      },
+      "__manifest": {
+        "name": "aws-kb-retrieval",
+        "description": "AWS Knowledge Base Retrieval MCP Server for RAG operations using Bedrock Agent Runtime",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/aws-kb-retrieval-server",
+        "tags": ["aws", "bedrock", "rag", "knowledge-base", "retrieval"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": [
+          "run", "-i", "--rm", "-e", "AWS_ACCESS_KEY_ID", "-e", "AWS_SECRET_ACCESS_KEY", "-e", "AWS_REGION",
+          "mcp/aws-kb-retrieval-server"
+        ]
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_API_KEY_HERE"
+      },
+      "__manifest": {
+        "name": "brave-search",
+        "description": "Brave Search MCP Server providing web and local search capabilities",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search",
+        "tags": ["search", "web", "local", "brave", "api"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "-e", "BRAVE_API_KEY", "mcp/brave-search"]
+      }
+    },
+    "everart": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everart"],
+      "env": {
+        "EVERART_API_KEY": "your_key_here"
+      },
+      "__manifest": {
+        "name": "everart",
+        "description": "EverArt MCP Server for image generation using EverArt's API",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/everart",
+        "tags": ["image", "generation", "everart", "ai", "art"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "-e", "EVERART_API_KEY", "mcp/everart"]
+      }
+    },
+    "everything": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything"],
+      "__manifest": {
+        "name": "everything",
+        "description": "Everything MCP Server - comprehensive test server showcasing all MCP protocol features",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/everything",
+        "tags": ["test", "demo", "comprehensive", "protocol", "showcase"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/everything"]
+      }
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "__manifest": {
+        "name": "fetch",
+        "description": "Fetch MCP Server for web content retrieval and HTML to markdown conversion",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch",
+        "tags": ["web", "fetch", "html", "markdown", "content"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/fetch"]
+      },
+      "__pip": {
+        "command": "python",
+        "args": ["-m", "mcp_server_fetch"]
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/username/Desktop", "/path/to/other/allowed/dir"],
+      "__manifest": {
+        "name": "filesystem",
+        "description": "Filesystem MCP Server for file operations with sandboxed directory access",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+        "tags": ["filesystem", "files", "directories", "operations", "sandboxed"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": [
+          "run", "-i", "--rm",
+          "--mount", "type=bind,src=/Users/username/Desktop,dst=/projects/Desktop",
+          "--mount", "type=bind,src=/path/to/other/allowed/dir,dst=/projects/other/allowed/dir,ro",
+          "mcp/filesystem", "/projects"
+        ]
+      }
+    },
+    "gdrive": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gdrive"],
+      "env": {
+        "GDRIVE_CREDENTIALS_PATH": "/path/to/.gdrive-server-credentials.json"
+      },
+      "__manifest": {
+        "name": "gdrive",
+        "description": "Google Drive MCP Server for listing, reading, and searching Google Drive files",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive",
+        "tags": ["google", "drive", "files", "search", "cloud"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": [
+          "run", "-i", "--rm", "-v", "mcp-gdrive:/gdrive-server",
+          "-e", "GDRIVE_CREDENTIALS_PATH=/gdrive-server/credentials.json", "mcp/gdrive"
+        ]
+      }
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git"],
+      "__manifest": {
+        "name": "git",
+        "description": "Git MCP Server for Git repository interaction and automation",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
+        "tags": ["git", "repository", "version-control", "automation"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": [
+          "run", "--rm", "-i", "--mount", "type=bind,src=/Users/username,dst=/Users/username", "mcp/git"
+        ]
+      },
+      "__pip": {
+        "command": "python",
+        "args": ["-m", "mcp_server_git"]
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
+      },
+      "__manifest": {
+        "name": "github",
+        "description": "GitHub MCP Server for GitHub API operations, file management, and repository interactions",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/github",
+        "tags": ["github", "api", "repository", "files", "issues", "pull-requests"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "mcp/github"]
+      }
+    },
+    "gitlab": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+      "env": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>",
+        "GITLAB_API_URL": "https://gitlab.com/api/v4"
+      },
+      "__manifest": {
+        "name": "gitlab",
+        "description": "GitLab MCP Server for GitLab API operations and project management",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/gitlab",
+        "tags": ["gitlab", "api", "project", "management", "repository"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "--rm", "-i", "-e", "GITLAB_PERSONAL_ACCESS_TOKEN", "-e", "GITLAB_API_URL", "mcp/gitlab"]
+      }
+    },
+    "google-maps": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-google-maps"],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "<YOUR_API_KEY>"
+      },
+      "__manifest": {
+        "name": "google-maps",
+        "description": "Google Maps MCP Server for geocoding, places search, directions, and mapping services",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps",
+        "tags": ["google", "maps", "geocoding", "places", "directions", "location"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "-e", "GOOGLE_MAPS_API_KEY", "mcp/google-maps"]
+      }
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "/path/to/custom/memory.json"
+      },
+      "__manifest": {
+        "name": "memory",
+        "description": "Knowledge Graph Memory Server for persistent memory using local knowledge graph",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
+        "tags": ["memory", "knowledge-graph", "persistent", "entities", "relations"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "-v", "claude-memory:/app/dist", "--rm", "mcp/memory"]
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
+      "__manifest": {
+        "name": "postgres",
+        "description": "PostgreSQL MCP Server for read-only database access and schema inspection",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/postgres",
+        "tags": ["postgresql", "database", "sql", "read-only", "schema"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/postgres", "postgresql://host.docker.internal:5432/mydb"]
+      }
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "__manifest": {
+        "name": "puppeteer",
+        "description": "Puppeteer MCP Server for browser automation, screenshots, and web interaction",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer",
+        "tags": ["puppeteer", "browser", "automation", "screenshots", "web"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": [
+          "run", "-i", "--rm", "--init", "-e", "DOCKER_CONTAINER=true", "mcp/puppeteer"
+        ]
+      }
+    },
+    "redis": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-redis", "redis://localhost:6379"],
+      "__manifest": {
+        "name": "redis",
+        "description": "Redis MCP Server for Redis database operations and key-value store access",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/redis",
+        "tags": ["redis", "database", "key-value", "cache", "storage"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/redis", "redis://host.docker.internal:6379"]
+      }
+    },
+    "sentry": {
+      "command": "uvx",
+      "args": ["mcp-server-sentry"],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "YOUR_SENTRY_TOKEN"
+      },
+      "__manifest": {
+        "name": "sentry",
+        "description": "Sentry MCP Server for retrieving and analyzing error reports and issues",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/sentry",
+        "tags": ["sentry", "error", "monitoring", "debugging", "issues"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "-e", "SENTRY_AUTH_TOKEN", "mcp/sentry"]
+      },
+      "__pip": {
+        "command": "python",
+        "args": ["-m", "mcp_server_sentry"]
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "__manifest": {
+        "name": "sequential-thinking",
+        "description": "Sequential Thinking MCP Server for structured problem-solving and reflective analysis",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
+        "tags": ["thinking", "problem-solving", "analysis", "structured", "reflective"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "--rm", "-i", "mcp/sequentialthinking"]
+      }
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-your-bot-token",
+        "SLACK_TEAM_ID": "T01234567",
+        "SLACK_CHANNEL_IDS": "C01234567, C76543210"
+      },
+      "__manifest": {
+        "name": "slack",
+        "description": "Slack MCP Server for Slack workspace interaction and messaging",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/slack",
+        "tags": ["slack", "messaging", "workspace", "channels", "communication"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": [
+          "run", "-i", "--rm", "-e", "SLACK_BOT_TOKEN", "-e", "SLACK_TEAM_ID", "-e", "SLACK_CHANNEL_IDS",
+          "mcp/slack"
+        ]
+      }
+    },
+    "sqlite": {
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", "~/test.db"],
+      "__manifest": {
+        "name": "sqlite",
+        "description": "SQLite MCP Server for database operations and business intelligence capabilities",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite",
+        "tags": ["sqlite", "database", "sql", "business-intelligence", "analytics"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": [
+          "run", "--rm", "-i", "-v", "mcp-test:/mcp", "mcp/sqlite", "--db-path", "/mcp/test.db"
+        ]
+      }
+    },
+    "time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"],
+      "__manifest": {
+        "name": "time",
+        "description": "Time MCP Server for time and timezone conversion capabilities",
+        "repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/time",
+        "tags": ["time", "timezone", "conversion", "datetime", "iana"]
+      },
+      "__docker": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "mcp/time"]
+      },
+      "__pip": {
+        "command": "python",
+        "args": ["-m", "mcp_server_time"]
+      }
+    }
+  }
+} 
