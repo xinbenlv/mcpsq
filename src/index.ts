@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
@@ -7,6 +9,56 @@ import path from "node:path";
 import { z } from 'zod';
 import { commandBasedMcpServerSchema, defaultConfigSchema, mcpServerSchema, urlBasedMcpServerSchema } from "./config-schema";
 import { url } from "node:inspector";
+
+// CLI argument parsing
+const args = process.argv.slice(2);
+const showHelp = args.includes('--help') || args.includes('-h');
+const showVersion = args.includes('--version') || args.includes('-v');
+
+if (showHelp) {
+  console.log(`
+MCPSQ - MCP Server Discovery and Management Tool
+
+Usage:
+  npx @mcpsq/mcpsq [options]
+  mcpsq [options]
+
+Options:
+  --help, -h     Show this help message
+  --version, -v  Show version information
+  --port <port>  Specify port (default: 3000)
+
+Description:
+  MCPSQ is an MCP server that helps you discover and manage other MCP servers.
+  When started, it provides an HTTP server with MCP tools for:
+  - Finding relevant MCP servers
+  - Adding MCP servers to Cursor configuration
+  - Listing current MCP servers
+  - Removing MCP servers from configuration
+
+Examples:
+  npx @mcpsq/mcpsq              # Start the server on port 3000
+  npx @mcpsq/mcpsq --port 8080  # Start the server on port 8080
+
+For more information, visit: https://mcpsq.xyz
+`);
+  process.exit(0);
+}
+
+if (showVersion) {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+  console.log(`MCPSQ v${packageJson.version}`);
+  process.exit(0);
+}
+
+// Parse port from arguments
+const portIndex = args.indexOf('--port');
+const PORT = portIndex !== -1 && args[portIndex + 1] ? parseInt(args[portIndex + 1]) : 3000;
+
+if (isNaN(PORT) || PORT < 1 || PORT > 65535) {
+  console.error('Error: Invalid port number. Port must be between 1 and 65535.');
+  process.exit(1);
+}
 
 const cacheFileAndKeyNameToValidatedMcpServerConfig = new Map<string, z.infer<typeof mcpServerSchema>>();
 const readFullMcpServerListFromDiskAndSetCache = async () => {
@@ -339,9 +391,12 @@ app.post('/messages', async (req: Request, res: Response) => {
 });
 
 // Start the server
-const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Simple SSE Server (deprecated protocol version 2024-11-05) listening on port ${PORT}`);
+  console.log(`🚀 MCPSQ Server started successfully!`);
+  console.log(`📡 MCP endpoint: http://localhost:${PORT}/mcp`);
+  console.log(`🔧 Configure Cursor MCP: Add "mcpsq": {"url": "http://localhost:${PORT}/mcp"} to your mcp.json`);
+  console.log(`📚 Documentation: https://mcpsq.xyz`);
+  console.log(`⏹️  Press Ctrl+C to stop the server`);
 });
 
 // Handle server shutdown
