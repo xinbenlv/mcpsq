@@ -12,7 +12,13 @@
       "__manifest": {
         "name": "github",
         "description": "GitHub MCP Server (Official)",
-        "repository": "https://github.com/github/github-mcp-server"
+        "repository": "https://github.com/github/github-mcp-server",
+        "tags": [
+          "github",
+          "mcp",
+          "modelcontextprotocol",
+          "omcp"
+        ]
       }
     }
   }

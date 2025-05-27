@@ -21,6 +21,7 @@ export const manifestBasedMcpServerSchema = z.object({
     author: z.string().optional(),
     license: z.string().optional(),
     version: z.string().optional(),
+    tags: z.array(z.string()).optional(),
   }),
 });
 
