@@ -2,9 +2,13 @@
   "name": "mcpsq",
   "version": "1.0.0",
   "scripts": {
-    "start": "bun run src/index.ts",
-    "validate:data": "bun run src/validate-data.ts",
-    "typecheck": "tsc --noEmit"
+    "start": "tsx src/index.ts",
+    "dev": "nodemon",
+    "build": "tsc",
+    "clean": "rm -rf build",
+    "validate:data": "tsx src/validate-data.ts",
+    "typecheck": "tsc --noEmit",
+    "prebuild": "npm run clean"
   },
   "keywords": [
     "mcp",
@@ -18,6 +22,8 @@
   "devDependencies": {
     "@types/express": "^5.0.2",
     "@types/node": "^22.10.0",
+    "nodemon": "^3.0.2",
+    "tsx": "^4.7.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
