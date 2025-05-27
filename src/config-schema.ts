@@ -34,22 +34,21 @@ export const pipConfigSchema = z.object({
 }).strict();
 
 // Complete MCP server schema that combines all possible fields
-export const mcpServerSchema = z.object({
-  // Core configuration (either command-based or url-based)
-  command: z.string().optional(),
-  args: z.array(z.string()).optional(),
-  url: z.string().optional(),
-  env: z.record(z.string(), z.string()).optional(),
-  
-  // Optional metadata and alternative configurations
-  __manifest: manifestSchema.optional(),
-  __docker: dockerConfigSchema.optional(),
-  __pip: pipConfigSchema.optional(),
-}).strict()
-.refine((data) => {
+export const mcpServerSchema = z.union([
+  commandBasedMcpServerSchema.extend({
+    __manifest: manifestSchema.optional(),
+    __docker: dockerConfigSchema.optional(),
+    __pip: pipConfigSchema.optional(),
+  }),
+  urlBasedMcpServerSchema.extend({
+    __manifest: manifestSchema.optional(),
+    __docker: dockerConfigSchema.optional(),
+    __pip: pipConfigSchema.optional(),
+  }),
+]).refine((data) => {
   // Ensure either command+args OR url is provided (but not both)
-  const hasCommand = data.command !== undefined && data.args !== undefined;
-  const hasUrl = data.url !== undefined;
+  const hasCommand = 'command' in data && 'args' in data;
+  const hasUrl = 'url' in data;
   return hasCommand !== hasUrl; // XOR: exactly one should be true
 }, {
   message: "Server must have either (command + args) OR url, but not both"

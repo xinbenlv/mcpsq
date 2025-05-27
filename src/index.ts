@@ -5,7 +5,8 @@ import express, { Request, Response } from 'express';
 import fs from "node:fs";
 import path from "node:path";
 import { z } from 'zod';
-import { defaultConfigSchema, mcpServerSchema, urlBasedMcpServerSchema } from "./config-schema";
+import { commandBasedMcpServerSchema, defaultConfigSchema, mcpServerSchema, urlBasedMcpServerSchema } from "./config-schema";
+import { url } from "node:inspector";
 
 const cache = new Map<string, z.infer<typeof mcpServerSchema>>();
 const readFullMcpServerListFromDiskAndSetCache = async () => {
@@ -57,40 +58,72 @@ const getServer = () => {
     }
   );
 
-  server.tool(
-    'add-mcp-server-to-cursor',
-    'Add the remote MCP server to cursor',
-    urlBasedMcpServerSchema.shape as z.ZodRawShape,
-    async ({ url, env }) => {
-      // Update the /user/mcp.json file
-      try {
+  // Helper function to update MCP configuration
+  const updateMcpConfig = async (
+    serverKey: string,
+    serverConfig: any,
+    schema: z.ZodSchema<any>,
+    successMessage: string,
+    errorPrefix: string
+  ) => {
+    try {
+      // Validate the server config using the provided schema
+      const validatedServerConfig = schema.parse(serverConfig);
       const userMcpJson = path.join(process.env.HOME || '', '.cursor', 'mcp.json');
       const userMcpJsonContent = fs.readFileSync(userMcpJson, 'utf8');
       const userMcpJsonData = JSON.parse(userMcpJsonContent);
-      userMcpJsonData.mcpServers[url] = {
-        url: url,
-        env: env,
-      };
+      userMcpJsonData.mcpServers[serverKey] = validatedServerConfig;
       fs.writeFileSync(userMcpJson, JSON.stringify(userMcpJsonData, null, 2));
 
       return {
         content: [
           {
-            type: 'text',
-            text: `Successfully added remote MCP server to cursor: ${JSON.stringify(userMcpJsonData, null, 2)}`,
+            type: 'text' as const,
+            text: `${successMessage}: ${JSON.stringify(userMcpJsonData, null, 2)}`,
           }
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Failed to add remote MCP server ${name} (${url}) to cursor: ${error instanceof Error ? error.message : String(error)}`,
-            }
-          ],
-        };
-      }
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `${errorPrefix}: ${error instanceof Error ? error.message : String(error)}`,
+          }
+        ],
+      };
+    }
+  };
+
+  server.tool(
+    'add-command-based-mcp-server-to-cursor',
+    'Add the command-based remote MCP server to cursor',
+    commandBasedMcpServerSchema.shape as z.ZodRawShape,
+    async (params) => {
+      const { command, args, env } = params;
+      return updateMcpConfig(
+        command,
+        { command, args, env },
+        commandBasedMcpServerSchema,
+        'Successfully added command-based MCP server to cursor',
+        'Failed to add command-based MCP server to cursor'
+      );
+    }
+  );  
+
+  server.tool(
+    'add-url-based-mcp-server-to-cursor',
+    'Add the url-based remote MCP server to cursor',
+    urlBasedMcpServerSchema.shape as z.ZodRawShape,
+    async (params) => {
+      const { url, env } = params;
+      return updateMcpConfig(
+        url,
+        { url, env },
+        urlBasedMcpServerSchema,
+        'Successfully added remote MCP server to cursor',
+        `Failed to add remote MCP server (${url}) to cursor`
+      );
     }
   );
   return server;
