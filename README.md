@@ -16,7 +16,7 @@ The data is stored in the `data` directory.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a pull request that updates the data in the `data` directory.
+Contributions are welcome! Please feel free to submit a pull request that updates the data in the [`data` directory](data).
 
 ## License
 
