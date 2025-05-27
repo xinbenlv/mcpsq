@@ -1,6 +1,8 @@
-# MCPSQ a simple MCP server to discover and manage MCP servers of your needs
+# MCP^2(MCPSQ)
 
 [![CI/CD](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml/badge.svg)](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml)
+
+MCP^2(MCPSQ) is a simple MCP server to discover and manage MCP servers. See our website [mcpsq.xyz](https://mcpsq.xyz) for more information.
 
 ## Usage
 

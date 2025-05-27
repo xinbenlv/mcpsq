@@ -5,6 +5,30 @@ import express, { Request, Response } from 'express';
 import fs from "node:fs";
 import path from "node:path";
 import { z } from 'zod';
+import { defaultConfigSchema, mcpServerSchema, urlBasedMcpServerSchema } from "./config-schema";
+
+const cache = new Map<string, z.infer<typeof mcpServerSchema>>();
+const readFullMcpServerListFromDiskAndSetCache = async () => {
+  const dataDir = path.join(__dirname, "..", "data");
+  const files = fs.readdirSync(dataDir);
+  cache.clear();
+  files.filter((file) => file.endsWith(".json")).map((file) => {
+    const filePath = path.join(dataDir, file);
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    const fileWithoutExtension = file.replace(/\.[^/.]+$/, "");
+    const mcpServer = defaultConfigSchema.parse(JSON.parse(fileContent));
+    for (const server in mcpServer.mcpServers) {
+      const serverData = mcpServer.mcpServers[server];
+      cache.set(`${fileWithoutExtension}/${server}`, serverData);
+    }
+  });
+};
+
+const getMcpServerListFromCacheOrFetch = async (query: string):
+  Promise<Array<z.infer<typeof mcpServerSchema>>> => {
+  await readFullMcpServerListFromDiskAndSetCache();
+  return Array.from(cache.values());
+};
 
 const getServer = () => {
   const server = new McpServer({
@@ -13,57 +37,20 @@ const getServer = () => {
   }, { capabilities: { logging: {} } });
 
   server.tool(
-    'find-mcp-for',
+    'find-mcp-server',
     'Find MCP server relevant to the query',
     {
       query: z.string().describe('Query to find MCP server relevant to'),
     },
-    async ({ query }, { sendNotification }): Promise<CallToolResult> => {
-      // Send the initial notification
-      await sendNotification({
-        method: "notifications/message",
-        params: {
-          level: "info",
-          data: `Starting querying MCP server relevant to the query: ${query}`
-        }
-      });
-
-      const results = [{
-        name: "github",
-        url: "https://github.com/mcp-server/github",
-        description: "GitHub MCP server",
-      }, {
-        name: "google-maps",
-        url: "https://google-maps.com/mcp-server/google-maps",
-        description: "Google Maps MCP server",
-      },
-      {
-        name: "weather",
-        url: "https://weather.com/mcp-server/weather",
-        description: "Weather MCP server",
-      }, {
-        name: "news",
-        url: "https://news.com/mcp-server/news",
-        description: "News MCP server",
-      }, {
-        name: "namefi",
-        url: "https://namefi.com/mcp-server/namefi",
-        description: "Namefi MCP server",
-      }]
-
-      await Promise.all(results.map(server => sendNotification({
-        method: "notifications/message",
-        params: {
-          level: "info",
-          data: `Relevant MCP servers: ${server.name}`
-        }
-      })));
+    async ({ query }): Promise<CallToolResult> => {
+      const results = await getMcpServerListFromCacheOrFetch(query);
 
       return {
         content: [
           {
             type: 'text',
-            text: `Completed returning ${results.length} relevant MCP servers: ${JSON.stringify(results, null, 2)}`,
+            text: `Completed returning ${results.length} relevant MCP servers`,
+            data: results,
           }
         ],
       };
@@ -72,23 +59,17 @@ const getServer = () => {
 
   server.tool(
     'add-mcp-server-to-cursor',
-    'Add remote MCP server to cursor',
-    {
-      name: z.string().describe('Name of the remote MCP server'),
-      url: z.string().describe('URL of the remote MCP server'),
-      apiKey: z.string().optional().describe('API key of the remote MCP server'),
-    },
-    async ({ name, url, apiKey }) => {
+    'Add the remote MCP server to cursor',
+    urlBasedMcpServerSchema.shape as z.ZodRawShape,
+    async ({ url, env }) => {
       // Update the /user/mcp.json file
       try {
       const userMcpJson = path.join(process.env.HOME || '', '.cursor', 'mcp.json');
       const userMcpJsonContent = fs.readFileSync(userMcpJson, 'utf8');
       const userMcpJsonData = JSON.parse(userMcpJsonContent);
-      userMcpJsonData.mcpServers[name] = {
+      userMcpJsonData.mcpServers[url] = {
         url: url,
-        env: {
-          API_KEY: apiKey || undefined
-        }
+        env: env,
       };
       fs.writeFileSync(userMcpJson, JSON.stringify(userMcpJsonData, null, 2));
 

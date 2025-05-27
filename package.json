@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "bun run src/index.ts",
-    "validate": "bun run src/validate-data.ts"
+    "validate:data": "bun run src/validate-data.ts",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "mcp",

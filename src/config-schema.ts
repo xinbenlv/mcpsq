@@ -9,8 +9,8 @@ export const commandBasedMcpServerSchema = z.object({
 }).strict();
 
 export const urlBasedMcpServerSchema = z.object({
-  url: z.string(),
-  env: z.record(z.string(), z.string()).optional(),
+  url: z.string().describe('URL of the remote MCP server'),
+  env: z.record(z.string(), z.string()).optional().describe('Environment variables of the remote MCP server'),
 }).strict();
 
 export const manifestSchema = z.object({
