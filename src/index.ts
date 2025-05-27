@@ -152,6 +152,119 @@ const getServer = () => {
       );
     }
   );
+
+  server.tool(
+    'list-current-mcp-servers',
+    'Read current list of MCP servers from cursor mcp.json',
+    {},
+    async (): Promise<CallToolResult> => {
+      try {
+        const userMcpJson = path.join(process.env.HOME || '', '.cursor', 'mcp.json');
+        
+        if (!fs.existsSync(userMcpJson)) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: 'No mcp.json file found in cursor configuration directory',
+              }
+            ],
+          };
+        }
+
+        const userMcpJsonContent = fs.readFileSync(userMcpJson, 'utf8');
+        const userMcpJsonData = JSON.parse(userMcpJsonContent);
+        const mcpServers = userMcpJsonData.mcpServers || {};
+        const serverKeys = Object.keys(mcpServers);
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Found ${serverKeys.length} MCP servers in cursor configuration: ${JSON.stringify(mcpServers, null, 2)}`,
+            }
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Failed to read MCP servers from cursor: ${error instanceof Error ? error.message : String(error)}`,
+            }
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  server.tool(
+    'remove-mcp-server-from-cursor',
+    'Remove an MCP server from the cursor configuration',
+    {
+      serverKey: z.string().describe('Key of the MCP server to remove from cursor configuration'),
+    },
+    async (params): Promise<CallToolResult> => {
+      try {
+        const { serverKey } = params;
+        const userMcpJson = path.join(process.env.HOME || '', '.cursor', 'mcp.json');
+        
+        if (!fs.existsSync(userMcpJson)) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: 'No mcp.json file found in cursor configuration directory',
+              }
+            ],
+            isError: true,
+          };
+        }
+
+        const userMcpJsonContent = fs.readFileSync(userMcpJson, 'utf8');
+        const userMcpJsonData = JSON.parse(userMcpJsonContent);
+        
+        if (!userMcpJsonData.mcpServers || !userMcpJsonData.mcpServers[serverKey]) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: `MCP server with key '${serverKey}' not found in cursor configuration`,
+              }
+            ],
+            isError: true,
+          };
+        }
+
+        // Remove the server
+        delete userMcpJsonData.mcpServers[serverKey];
+        
+        // Write back to file
+        fs.writeFileSync(userMcpJson, JSON.stringify(userMcpJsonData, null, 2));
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Successfully removed MCP server '${serverKey}' from cursor configuration`,
+            }
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Failed to remove MCP server from cursor: ${error instanceof Error ? error.message : String(error)}`,
+            }
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
   return server;
 };
 
