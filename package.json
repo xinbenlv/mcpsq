@@ -1,26 +1,28 @@
 {
-  "name": "mcp-quickstart-ts",
+  "name": "mcpsq",
   "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
-  "bin": {
-    "weather": "./build/index.js"
-  },
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\""
+    "start": "bun run src/index.ts"
   },
   "files": [
     "build"
   ],
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "cursor",
+    "cursor-mcp"
+  ],
+  "author": "Zainan Victor Zhou <zzn-github@zzn.im>",
+  "license": "MIT",
+  "description": "A simple MCP server to discover and manage MCP servers of your needs",
   "devDependencies": {
+    "@types/express": "^5.0.2",
     "@types/node": "^22.10.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.4.0"
+    "@modelcontextprotocol/sdk": "^1.4.0",
+    "express": "^5.1.0"
   }
 }
