@@ -1,6 +1,6 @@
 # MCPSQ a simple MCP server to discover and manage MCP servers of your needs
 
-[![CI](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml/badge.svg)](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml)
+[![CI/CD](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml/badge.svg)](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml)
 
 ## Usage
 
