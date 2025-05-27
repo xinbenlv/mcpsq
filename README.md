@@ -132,6 +132,61 @@ npm run typecheck
 - **Tools not appearing**: Check Cursor's MCP logs in the output panel
 - **TypeScript errors**: Run `npm run typecheck` to see detailed error messages
 
+## Heroku Deployment
+
+MCPSQ can be easily deployed to Heroku for cloud hosting:
+
+### Prerequisites
+
+- [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) installed
+- Heroku account
+
+### Deployment Steps
+
+1. **Login to Heroku**:
+```bash
+heroku login
+```
+
+2. **Create a new Heroku app**:
+```bash
+heroku create your-mcpsq-app-name
+```
+
+3. **Deploy to Heroku**:
+```bash
+git push heroku main
+```
+
+4. **Open your deployed app**:
+```bash
+heroku open
+```
+
+### Configuration
+
+The app will automatically:
+- Use Heroku's `PORT` environment variable
+- Build the TypeScript code during deployment via `heroku-postbuild` script
+- Start the server using the compiled JavaScript
+
+Your MCPSQ server will be available at:
+- **MCP endpoint**: `https://your-app-name.herokuapp.com/mcp`
+
+### Using with Cursor
+
+Configure Cursor to use your Heroku-deployed MCPSQ server:
+
+```json
+{
+  "mcpServers": {
+    "mcpsq": {
+      "url": "https://your-app-name.herokuapp.com/mcp"
+    }
+  }
+}
+```
+
 ## Data
 
 The data is stored in the `data` directory.
@@ -142,7 +197,8 @@ Contributions are welcome! Please feel free to submit a pull request that update
 
 ## ROADMAP
 - [x] handle env vars needed 
-- [ ] publish to npmjs.com 
+- [x] publish to npmjs.com 
+- [x] add Heroku deployment support
 
 ## License
 

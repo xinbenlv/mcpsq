@@ -53,7 +53,7 @@ if (showVersion) {
 
 // Parse port from arguments
 const portIndex = args.indexOf('--port');
-const PORT = portIndex !== -1 && args[portIndex + 1] ? parseInt(args[portIndex + 1]) : 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : (portIndex !== -1 && args[portIndex + 1] ? parseInt(args[portIndex + 1]) : 3000);
 
 if (isNaN(PORT) || PORT < 1 || PORT > 65535) {
   console.error('Error: Invalid port number. Port must be between 1 and 65535.');

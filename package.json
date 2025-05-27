@@ -4,8 +4,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "bin": {
-    "mcpsq": "build/index.js",
-    "@mcpsq/mcpsq": "build/index.js"
+    "mcpsq": "build/index.js"
   },
   "files": [
     "build/**/*",
@@ -24,15 +23,20 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
-    "start": "tsx src/index.ts",
+    "start": "node build/index.js",
     "dev": "nodemon",
     "build": "tsc",
     "clean": "rm -rf build",
     "validate:data": "tsx src/validate-data.ts",
     "typecheck": "tsc --noEmit",
     "prebuild": "npm run clean",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [
     "mcp",
