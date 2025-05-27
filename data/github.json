@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "<Your GitHub token here>"
+      },
+      "__manifest": {
+        "name": "github",
+        "description": "GitHub MCP Server (Official)",
+        "repository": "https://github.com/github/github-mcp-server"
+      }
+    }
+  }
+}

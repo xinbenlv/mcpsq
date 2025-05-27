@@ -1,3 +1,21 @@
-# A Simple MCP weather Server written in TypeScript
+# MCPSQ a simple MCP server to discover and manage MCP servers of your needs
 
-See the [Quickstart](https://modelcontextprotocol.io/quickstart) tutorial for more information.
+[![CI](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml/badge.svg)](https://github.com/xinbenlv/mcpsq/actions/workflows/ci.yml)
+
+## Usage
+
+```bash
+bun run src/index.ts
+```
+
+## Data
+
+The data is stored in the `data` directory.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
