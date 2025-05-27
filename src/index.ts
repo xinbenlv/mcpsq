@@ -8,11 +8,11 @@ import { z } from 'zod';
 import { commandBasedMcpServerSchema, defaultConfigSchema, mcpServerSchema, urlBasedMcpServerSchema } from "./config-schema";
 import { url } from "node:inspector";
 
-const cache = new Map<string, z.infer<typeof mcpServerSchema>>();
+const cacheFileAndKeyNameToValidatedMcpServerConfig = new Map<string, z.infer<typeof mcpServerSchema>>();
 const readFullMcpServerListFromDiskAndSetCache = async () => {
   const dataDir = path.join(__dirname, "..", "data");
   const files = fs.readdirSync(dataDir);
-  cache.clear();
+  cacheFileAndKeyNameToValidatedMcpServerConfig.clear();
   files.filter((file) => file.endsWith(".json")).map((file) => {
     const filePath = path.join(dataDir, file);
     const fileContent = fs.readFileSync(filePath, "utf8");
@@ -20,16 +20,22 @@ const readFullMcpServerListFromDiskAndSetCache = async () => {
     const mcpServer = defaultConfigSchema.parse(JSON.parse(fileContent));
     for (const server in mcpServer.mcpServers) {
       const serverData = mcpServer.mcpServers[server];
-      cache.set(`${fileWithoutExtension}/${server}`, serverData);
+      cacheFileAndKeyNameToValidatedMcpServerConfig.set(`${fileWithoutExtension}/${server}`, serverData);
     }
   });
 };
 
-const getMcpServerListFromCacheOrFetch = async (query: string):
-  Promise<Array<z.infer<typeof mcpServerSchema>>> => {
-  await readFullMcpServerListFromDiskAndSetCache();
-  return Array.from(cache.values());
-};
+const getMcpServerListFromCacheOrFetch = async (_query: string/* TODO use in the future. */):
+  Promise<Array<Record<string, z.infer<typeof mcpServerSchema>>>> => {
+    await readFullMcpServerListFromDiskAndSetCache();
+    return Array.from(cacheFileAndKeyNameToValidatedMcpServerConfig.keys()).map((key) => {
+      const value = cacheFileAndKeyNameToValidatedMcpServerConfig.get(key);
+      if (!value) {
+        throw new Error(`Cache value not found for key: ${key}`);
+      }
+      return { [key]: value };
+    });
+  };
 
 const getServer = () => {
   const server = new McpServer({
@@ -45,13 +51,12 @@ const getServer = () => {
     },
     async ({ query }): Promise<CallToolResult> => {
       const results = await getMcpServerListFromCacheOrFetch(query);
-
+      console.log(`results: ${JSON.stringify(results, null, 2)}`);
       return {
         content: [
           {
-            type: 'text',
-            text: `Completed returning ${results.length} relevant MCP servers`,
-            data: results,
+            type: 'text' as const,
+            text: `Completed returning ${results.length} relevant MCP servers: ${JSON.stringify(results, null, 2)}`,
           }
         ],
       };
@@ -61,25 +66,50 @@ const getServer = () => {
   // Helper function to update MCP configuration
   const updateMcpConfig = async (
     serverKey: string,
-    serverConfig: any,
-    schema: z.ZodSchema<any>,
-    successMessage: string,
-    errorPrefix: string
+    providedEnv: Record<string, string> | undefined
   ) => {
     try {
       // Validate the server config using the provided schema
-      const validatedServerConfig = schema.parse(serverConfig);
+      const validatedServerConfig = cacheFileAndKeyNameToValidatedMcpServerConfig.get(serverKey);
+
+      // check if all env vars required by mcpServer config are present
+      if (validatedServerConfig?.env) {
+        const missingEnvVars = [];
+        for (const [key, _value] of Object.entries(validatedServerConfig.env)) {
+          if (!providedEnv?.[key]) {
+            missingEnvVars.push(key);
+          }
+        }
+        if (missingEnvVars.length > 0) {  
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: `Environment variable ${missingEnvVars.join(', ')} is not set. Please provide it and try again.`,
+              }
+            ],
+            isError: true,
+          };
+        }
+      }
+
+      // update config
       const userMcpJson = path.join(process.env.HOME || '', '.cursor', 'mcp.json');
       const userMcpJsonContent = fs.readFileSync(userMcpJson, 'utf8');
       const userMcpJsonData = JSON.parse(userMcpJsonContent);
       userMcpJsonData.mcpServers[serverKey] = validatedServerConfig;
+      // override the env vars if provided
+      if (providedEnv) {
+        userMcpJsonData.mcpServers[serverKey].env = providedEnv;
+      }
+
       fs.writeFileSync(userMcpJson, JSON.stringify(userMcpJsonData, null, 2));
 
       return {
         content: [
           {
             type: 'text' as const,
-            text: `${successMessage}: ${JSON.stringify(userMcpJsonData, null, 2)}`,
+            text: `Successfully added remote MCP server to cursor`,
           }
         ],
       };
@@ -88,41 +118,37 @@ const getServer = () => {
         content: [
           {
             type: 'text' as const,
-            text: `${errorPrefix}: ${error instanceof Error ? error.message : String(error)}`,
+            text: `Failed to add remote MCP server to cursor: ${error instanceof Error ? error.message : String(error)}`,
           }
         ],
       };
     }
-  };
+  }; 
 
   server.tool(
-    'add-command-based-mcp-server-to-cursor',
-    'Add the command-based remote MCP server to cursor',
-    commandBasedMcpServerSchema.shape as z.ZodRawShape,
+    'add-mcp-server-to-cursor',
+    'Add MCP server to cursor mcp.json',
+    {
+      cacheKey: z.string().describe('Key to use for the MCP server in the cache'),
+      env: z.record(z.string(), z.string()).optional().describe('Environment variables of the remote MCP server'),
+    },
     async (params) => {
-      const { command, args, env } = params;
-      return updateMcpConfig(
-        command,
-        { command, args, env },
-        commandBasedMcpServerSchema,
-        'Successfully added command-based MCP server to cursor',
-        'Failed to add command-based MCP server to cursor'
-      );
-    }
-  );  
+      const { cacheKey, env } = params;
+      const cacheValue = cacheFileAndKeyNameToValidatedMcpServerConfig.get(cacheKey);
+      if (!cacheValue) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `No MCP server found in cache with key: ${url}`,
+            }
+          ],
+        };
+      }
 
-  server.tool(
-    'add-url-based-mcp-server-to-cursor',
-    'Add the url-based remote MCP server to cursor',
-    urlBasedMcpServerSchema.shape as z.ZodRawShape,
-    async (params) => {
-      const { url, env } = params;
       return updateMcpConfig(
-        url,
-        { url, env },
-        urlBasedMcpServerSchema,
-        'Successfully added remote MCP server to cursor',
-        `Failed to add remote MCP server (${url}) to cursor`
+        cacheKey,
+        env
       );
     }
   );
