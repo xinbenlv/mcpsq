@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mcpsq": {
+      "url": "https://v1.mcpsq.xyz/mcp",
+      "__manifest": {
+        "name": "mcpsq",
+        "description": "The MCP registry and manager for Cursor, Claude(soon), ChatGPT(soon) & Beyond. Find, configure, and install Model Context Protocol servers instantly — without leaving your AI IDE.",
+        "repository": "https://mcpsq.xyz",
+        "tags": [
+          "mcp",
+          "mcp-servers"
+        ]
+      }
+    }
+  }
+}
