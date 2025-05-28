@@ -338,7 +338,8 @@ const corsOptions = {
   origin: [
     /^https:\/\/.*\.mcpsq\.xyz$/,  // Allow all subdomains of mcpsq.xyz
     'https://www-mcpsq-xyz.lovable.app/',
-    'https://lovable.dev/projects/ee20f748-d567-430b-9013-41792913c324'
+    'https://lovable.dev/projects/ee20f748-d567-430b-9013-41792913c324',
+    'https://id-preview--ee20f748-d567-430b-9013-41792913c324.lovable.app',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
