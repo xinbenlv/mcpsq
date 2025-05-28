@@ -341,6 +341,7 @@ const corsOptions = {
     'https://www-mcpsq-xyz.lovable.app/',
     'https://lovable.dev/projects/ee20f748-d567-430b-9013-41792913c324',
     'https://id-preview--ee20f748-d567-430b-9013-41792913c324.lovable.app',
+    'https://ee20f748-d567-430b-9013-41792913c324.lovableproject.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
