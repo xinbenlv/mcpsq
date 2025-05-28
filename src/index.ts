@@ -7,8 +7,9 @@ import express, { Request, Response } from 'express';
 import fs from "node:fs";
 import path from "node:path";
 import { z } from 'zod';
-import { commandBasedMcpServerSchema, defaultConfigSchema, mcpServerSchema, urlBasedMcpServerSchema } from "./config-schema";
+import { defaultConfigSchema, mcpServerSchema } from "./config-schema";
 import { url } from "node:inspector";
+import packageJson from '../package.json';
 
 // CLI argument parsing
 const args = process.argv.slice(2);
@@ -79,7 +80,9 @@ const readFullMcpServerListFromDiskAndSetCache = async () => {
 
 const getMcpServerListFromCacheOrFetch = async (_query: string/* TODO use in the future. */):
   Promise<Array<Record<string, z.infer<typeof mcpServerSchema>>>> => {
-    await readFullMcpServerListFromDiskAndSetCache();
+    if (cacheFileAndKeyNameToValidatedMcpServerConfig.size === 0) {
+      await readFullMcpServerListFromDiskAndSetCache();
+    }
     return Array.from(cacheFileAndKeyNameToValidatedMcpServerConfig.keys()).map((key) => {
       const value = cacheFileAndKeyNameToValidatedMcpServerConfig.get(key);
       if (!value) {
@@ -89,10 +92,17 @@ const getMcpServerListFromCacheOrFetch = async (_query: string/* TODO use in the
     });
   };
 
+const startedAt = new Date();
+const serverInfo = {
+  name: packageJson.name,
+  version: packageJson.version,
+  startedAt,
+}
+
 const getServer = () => {
   const server = new McpServer({
-    name: 'mcpsq',
-    version: '1.0.0',
+    name: serverInfo.name,
+    version: serverInfo.version,
   }, { capabilities: { logging: {} } });
 
   server.tool(
@@ -325,6 +335,15 @@ app.use(express.json());
 
 // Store transports by session ID
 const transports: Record<string, SSEServerTransport> = {};
+
+app.get('/registry', async (req: Request, res: Response) => {
+  const mcpServerList = await getMcpServerListFromCacheOrFetch('');
+  res.status(200).send(mcpServerList);
+});
+
+app.get('/healthz', (req: Request, res: Response) => {
+  res.status(200).send(serverInfo);
+});
 
 // SSE endpoint for establishing the stream
 app.get('/mcp', async (req: Request, res: Response) => {
