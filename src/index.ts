@@ -3,6 +3,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import cors from 'cors';
 import express, { Request, Response } from 'express';
 import fs from "node:fs";
 import path from "node:path";
@@ -331,6 +332,20 @@ const getServer = () => {
 };
 
 const app = express();
+
+// Configure CORS to allow requests from specific domains
+const corsOptions = {
+  origin: [
+    /^https:\/\/.*\.mcpsq\.xyz$/,  // Allow all subdomains of mcpsq.xyz
+    'https://www-mcpsq-xyz.lovable.app/',
+    'https://lovable.dev/projects/ee20f748-d567-430b-9013-41792913c324'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Store transports by session ID
