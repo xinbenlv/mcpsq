@@ -45,7 +45,7 @@ Please share the relevant configuration from your data file:
 ### Environment
 - OS: [e.g., macOS, Windows, Linux]
 - Node.js version: [e.g., 18.0.0]
-- Bun version: [e.g., 1.0.0]
+- NPM version: [e.g., 10.0.0]
 
 ### Error Messages
 ```

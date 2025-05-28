@@ -57,7 +57,7 @@ Please provide the exact configuration that will be added to the data file:
 - [ ] Tested command execution locally
 - [ ] Verified all dependencies are available
 - [ ] Verified the MCP server works with the provided configuration
-- [ ] Tested locally with `bun run src/index.ts`
+- [ ] Tested locally with `npm run dev`
 - [ ] Confirmed data appears correctly on [mcpsq.xyz](https://mcpsq.xyz)
 - [ ] Tested on multiple platforms (if applicable)
 

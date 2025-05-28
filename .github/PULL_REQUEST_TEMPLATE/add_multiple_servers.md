@@ -94,7 +94,7 @@ Please provide the complete configuration for all servers:
 - [ ] Tested all servers individually
 - [ ] Verified no conflicts between servers
 - [ ] All servers work with their provided configurations
-- [ ] Tested locally with `bun run src/index.ts`
+- [ ] Tested locally with `npm run dev`
 - [ ] Confirmed all data appears correctly on [mcpsq.xyz](https://mcpsq.xyz)
 - [ ] No breaking changes to existing functionality
 
