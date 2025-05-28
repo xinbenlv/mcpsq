@@ -336,6 +336,7 @@ const app = express();
 // Configure CORS to allow requests from specific domains
 const corsOptions = {
   origin: [
+    'https://mcpsq.xyz',
     /^https:\/\/.*\.mcpsq\.xyz$/,  // Allow all subdomains of mcpsq.xyz
     'https://www-mcpsq-xyz.lovable.app/',
     'https://lovable.dev/projects/ee20f748-d567-430b-9013-41792913c324',
